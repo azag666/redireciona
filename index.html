@@ -2,656 +2,129 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Desbloquear Conteúdo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atendimento via WhatsApp</title>
     
-    <!-- Google Fonts: Inter (Fonte limpa padrão de apps modernos) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS para estilização rápida e responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- FontAwesome -->
+    <!-- FontAwesome para o ícone do WhatsApp -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- Configuração de cores personalizadas no Tailwind -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
                     colors: {
-                        of: {
-                            blue: '#00AFF0',
-                            darkBlue: '#009ce0',
-                            bg: '#f8fafc',
-                            text: '#242529',
-                            gray: '#8a96a3',
-                            border: '#e0e6ea'
+                        whatsapp: {
+                            DEFAULT: '#25D366',
+                            dark: '#128C7E',
+                            light: '#DCF8C6'
                         }
-                    },
-                    boxShadow: {
-                        'up': '0 -4px 15px rgba(0, 0, 0, 0.05)',
                     }
                 }
             }
         }
     </script>
+
     <style>
-        /* Oculta scrollbar mas mantém funcionalidade */
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-        
-        /* Animação para o modal do PIX (Bottom Sheet) */
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
+        /* Animação de pulso para o ícone */
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
-        .slide-up {
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        .animate-pulse-soft {
+            animation: pulse-soft 2s infinite ease-in-out;
         }
-        
-        /* Animação para a tela de sucesso do PIX */
-        @keyframes scaleUp {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+
+        /* Animação de carregamento circular */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #25D366;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
         }
-        .scale-up {
-            animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        
-        /* Esconder as setas do input number */
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
-        input[type=number] {
-            -moz-appearance: textfield;
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
-    
-    <!-- Meta Pixel Code -->
-    <script>
-        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src='https://connect.facebook.net/en_US/fbevents.js';s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script');
-    </script>
-    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1817379038816925&ev=PageView&noscript=1"/></noscript>
-    <!-- End Meta Pixel Code -->
 </head>
-<body class="bg-gray-100 text-of-text font-sans antialiased selection:bg-of-blue selection:text-white flex justify-center">
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4 font-sans text-gray-800">
 
-    <!-- App Container (Mobile Simulator no Desktop) -->
-    <div class="w-full max-w-md bg-white min-h-screen relative shadow-2xl flex flex-col overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center border border-gray-100 transition-all">
         
-        <!-- Header Fixo -->
-        <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-of-border flex items-center px-4 py-3">
-            <button class="text-of-text hover:text-of-blue transition-colors p-2 -ml-2">
-                <i class="fa-solid fa-arrow-left text-lg"></i>
-            </button>
-            <h1 class="font-bold text-lg ml-2 tracking-tight uppercase">Assinar</h1>
-        </header>
-
-        <!-- Área de Rolagem Principal -->
-        <main class="flex-1 overflow-y-auto pb-32">
-            
-            <!-- Cover & Avatar Simulados -->
-            <div class="relative">
-                <!-- Cover Image (Gradient placeholder) -->
-                <div class="h-32 bg-gradient-to-r from-blue-100 to-of-blue/30 w-full object-cover"></div>
-                
-                <!-- Avatar -->
-                <div class="absolute -bottom-10 left-4">
-                    <div class="w-20 h-20 rounded-full border-4 border-white bg-gray-200 overflow-hidden relative shadow-sm">
-                        <!-- Imagem de avatar -->
-                        <img src="https://i.postimg.cc/JzPgQWKV/5159120317052554115.jpg" alt="Carolzinha" class="w-full h-full object-cover">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Profile Info -->
-            <div class="mt-12 px-4 pb-4 border-b border-of-border">
-                <div class="flex items-center gap-1">
-                    <h2 class="text-xl font-bold text-of-text tracking-tight">Carolzinha</h2>
-                    <i class="fa-solid fa-circle-check text-of-blue text-sm"></i>
-                </div>
-                <p class="text-of-gray text-sm">@carolzinha</p>
-                
-                <p class="mt-3 text-sm text-of-text leading-relaxed">
-                    Desbloqueie agora para ter acesso instantâneo a todo o conteúdo restrito, chat privado e atualizações diárias.
-                </p>
-            </div>
-
-            <!-- Seleção de Pacotes -->
-            <div class="px-4 py-5">
-                <h3 class="text-sm font-semibold text-of-gray uppercase tracking-wider mb-3">Escolha seu pacote</h3>
-                
-                <div class="flex flex-col gap-3">
-                    
-                    <!-- Basic Card -->
-                    <label class="relative flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-200 border-of-border bg-white" id="card-basic">
-                        <input type="radio" name="package" value="basic" class="peer hidden" onchange="updateSelection()">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-base">Pacote Básico</h4>
-                            <p class="text-xs text-of-gray mt-0.5">Acesso inicial ao conteúdo restrito.</p>
-                        </div>
-                        <div class="text-right pr-6">
-                            <span class="font-bold text-lg">$14</span>
-                        </div>
-                        <div class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 border-of-border flex items-center justify-center transition-all" id="check-basic">
-                            <i class="fa-solid fa-check text-white text-[10px] opacity-0" id="icon-basic"></i>
-                        </div>
-                    </label>
-
-                    <!-- Premium Card -->
-                    <label class="relative flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-200 border-of-blue bg-blue-50/50" id="card-premium">
-                        <input type="radio" name="package" value="premium" class="peer hidden" checked onchange="updateSelection()">
-                        <div class="absolute -top-2.5 left-4 bg-of-blue text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
-                            Mais Popular
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-base">Pacote Premium</h4>
-                            <p class="text-xs text-of-gray mt-0.5">Acesso VIP completo + Bônus e Chat.</p>
-                        </div>
-                        <div class="text-right pr-6">
-                            <span class="font-bold text-lg text-of-blue">$29</span>
-                        </div>
-                        <div class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 border-of-blue bg-of-blue flex items-center justify-center transition-all" id="check-premium">
-                            <i class="fa-solid fa-check text-white text-[10px] opacity-100" id="icon-premium"></i>
-                        </div>
-                    </label>
-
-                    <!-- Custom / Mimo Card -->
-                    <label class="relative flex flex-col p-4 border rounded-xl cursor-pointer transition-all duration-200 border-of-border bg-white" id="card-custom">
-                        <div class="flex items-center w-full">
-                            <input type="radio" name="package" value="custom" class="peer hidden" onchange="updateSelection()">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-base">Enviar um Mimo ❤️</h4>
-                                <p class="text-xs text-of-gray mt-0.5">Escolha o valor que deseja enviar para ajudar.</p>
-                            </div>
-                            <div class="absolute right-4 top-4 w-5 h-5 rounded-full border-2 border-of-border flex items-center justify-center transition-all" id="check-custom">
-                                <i class="fa-solid fa-check text-white text-[10px] opacity-0" id="icon-custom"></i>
-                            </div>
-                        </div>
-                        
-                        <!-- Inputs Expandidos (Visíveis apenas quando selecionado) -->
-                        <div id="custom-inputs" class="hidden mt-4 pt-4 border-t border-blue-100 flex gap-2 items-center">
-                            
-                            <div class="flex-1 relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-of-gray font-bold text-sm">$</span>
-                                <input type="number" id="input-usd" placeholder="0.00" min="1" step="0.5" class="w-full pl-7 pr-2 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-bold text-of-text outline-none focus:border-of-blue focus:ring-1 focus:ring-of-blue transition-all" oninput="handleCustomInput('usd')">
-                            </div>
-                            
-                            <div class="text-of-gray"><i class="fa-solid fa-right-left text-xs"></i></div>
-                            
-                            <div class="flex-1 relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-of-gray font-bold text-sm">R$</span>
-                                <input type="number" id="input-brl" placeholder="0.00" min="6" step="1" class="w-full pl-8 pr-2 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-bold text-of-text outline-none focus:border-of-blue focus:ring-1 focus:ring-of-blue transition-all" oninput="handleCustomInput('brl')">
-                            </div>
-                        </div>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Seleção de Pagamento -->
-            <div class="px-4 pb-6">
-                <h3 class="text-sm font-semibold text-of-gray uppercase tracking-wider mb-3">Forma de Pagamento</h3>
-                
-                <div class="grid grid-cols-2 gap-3">
-                    <!-- Stripe Button -->
-                    <button id="btn-card" onclick="setPayment('card')" class="flex flex-col items-center justify-center p-3 border-2 border-of-blue bg-blue-50/30 rounded-xl transition-all">
-                        <i class="fa-regular fa-credit-card text-2xl text-of-text mb-1"></i>
-                        <span class="text-sm font-semibold">Cartão (USD)</span>
-                    </button>
-                    
-                    <!-- PIX Button -->
-                    <button id="btn-pix" onclick="setPayment('pix')" class="flex flex-col items-center justify-center p-3 border-2 border-of-border bg-white rounded-xl transition-all text-of-gray hover:border-gray-300">
-                        <i class="fa-brands fa-pix text-2xl mb-1"></i>
-                        <span class="text-sm font-semibold">PIX (BRL)</span>
-                    </button>
-                </div>
-
-                <!-- Info Cotação PIX -->
-                <div id="pix-info" class="hidden mt-3 bg-gray-50 border border-gray-100 rounded-lg p-3 flex items-start gap-2">
-                    <i class="fa-solid fa-circle-info text-of-blue text-sm mt-0.5"></i>
-                    <p class="text-xs text-of-gray">O valor será convertido automaticamente para Reais.<br><strong class="text-of-text">Cotação Fixa: 1 USD = R$ 6,00</strong></p>
-                </div>
-            </div>
-
-            <!-- Segurança -->
-            <div class="flex items-center justify-center gap-2 text-xs text-of-gray pb-8">
-                <i class="fa-solid fa-lock"></i> Pagamento processado em ambiente 100% seguro
-            </div>
-        </main>
-
-        <!-- Sticky Bottom Bar (Botão de Ação) -->
-        <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-up z-40">
-            <button onclick="processCheckout()" class="w-full bg-of-blue hover:bg-of-darkBlue active:scale-[0.98] text-white rounded-full py-3.5 px-4 font-bold text-lg transition-all flex items-center justify-center gap-2">
-                <span id="cta-text">Assinar por $29</span>
-            </button>
+        <!-- Ícone do WhatsApp -->
+        <div class="w-24 h-24 bg-whatsapp-light rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-soft">
+            <i class="fa-brands fa-whatsapp text-whatsapp text-5xl"></i>
         </div>
 
-        <!-- Overlay Modal PIX -->
-        <div id="pix-modal-overlay" class="fixed inset-0 bg-black/60 z-50 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm" onclick="closePixModal()"></div>
-        
-        <!-- Bottom Sheet PIX Modal -->
-        <div id="pix-modal" class="fixed bottom-0 left-0 w-full bg-white rounded-t-3xl z-50 hidden flex-col shadow-2xl max-h-[90vh] overflow-y-auto">
-            
-            <div class="flex justify-center p-3">
-                <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
-            </div>
-            
-            <div id="pix-modal-content" class="px-6 pb-8 text-center relative">
-                <button onclick="closePixModal()" class="absolute right-4 top-0 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+        <!-- Textos Principais -->
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Quase lá!</h1>
+        <p class="text-gray-600 mb-6 leading-relaxed">
+            Estamos a transferir-te para o nosso atendimento seguro no WhatsApp.
+        </p>
 
-                <div class="inline-flex items-center justify-center w-12 h-12 bg-teal-100 text-teal-600 rounded-full mb-3">
-                    <i class="fa-brands fa-pix text-2xl"></i>
-                </div>
-                
-                <h3 class="text-xl font-bold mb-1">Pagamento via PIX</h3>
-                <p class="text-of-gray text-sm mb-6">Escaneie o QR Code ou copie o código Pix Copia e Cola.</p>
-                
-                <div class="bg-gray-50 border border-gray-200 p-4 rounded-2xl inline-block mb-6 shadow-sm">
-                    <img id="pix-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020126580014br.gov.bcb.pix0136sua-chave-pix-aqui-1234567895204000053039865405174.005802BR5915NOME DO RECEBEDOR6009SAO PAULO62140510DUMMYCODE16304ABCD" alt="QR Code PIX" class="w-40 h-40 mx-auto">
-                </div>
-
-                <div class="text-left mb-2">
-                    <label class="text-xs font-bold text-of-gray uppercase tracking-wider ml-1">Pix Copia e Cola</label>
-                </div>
-                <div class="bg-gray-100 border border-gray-200 rounded-xl flex items-center p-1.5 mb-2 relative">
-                    <input type="text" id="pix-code" readonly value="00020126580014br.gov.bcb.pix0136sua-chave-pix-aqui-1234567895204000053039865405174.005802BR5915NOME DO RECEBEDOR6009SAO PAULO62140510DUMMYCODE16304ABCD" class="bg-transparent text-sm text-gray-600 w-full px-3 outline-none truncate font-mono">
-                    <button onclick="copyPixCode()" class="bg-of-blue text-white px-5 py-2.5 rounded-lg text-sm font-bold active:scale-95 transition-transform shadow-sm whitespace-nowrap">
-                        Copiar
-                    </button>
-                </div>
-                
-                <p id="copy-msg" class="text-sm text-green-600 font-medium h-5 opacity-0 transition-opacity">Código copiado!</p>
-                
-                <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center px-2">
-                    <span class="text-of-gray font-medium">Total a pagar:</span>
-                    <span id="pix-modal-total" class="text-2xl font-black text-of-text">R$ 174,00</span>
-                </div>
-                <p class="text-xs text-of-gray mt-2">O acesso é liberado automaticamente após o pagamento.</p>
-            </div>
+        <!-- Área de Status / Redirecionamento -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-100 flex items-center justify-center text-sm font-medium text-gray-700">
+            <div class="loader"></div>
+            <span id="status-text">A redirecionar...</span>
         </div>
+
+        <!-- Botão de Ação Manual (Fallback) -->
+        <a id="whatsapp-link" href="#" class="block w-full bg-whatsapp hover:bg-whatsapp-dark text-white font-bold py-3 px-4 rounded-xl transition-colors duration-200 shadow-lg shadow-whatsapp/30 flex items-center justify-center gap-2">
+            <span>Ir para o WhatsApp agora</span>
+            <i class="fa-solid fa-arrow-right text-sm"></i>
+        </a>
+        
+        <!-- Texto de Segurança -->
+        <p class="text-xs text-gray-400 mt-6 flex items-center justify-center gap-1">
+            <i class="fa-solid fa-lock text-gray-300"></i> Ambiente 100% seguro
+        </p>
 
     </div>
 
     <script>
         // Configurações
-        const API_BASE_URL = 'https://novaapi-one.vercel.app';
-        const HOTTRACK_API_KEY = "a0b2f4ce-2011-4faf-9e77-52e59bbcb02b"; // Chave da API HotTrack
-        const PRESSEL_ID = 200;
-        const PIXELS_TO_TRACK = [{ "id": "1817379038816925" }];
+        const numeroWhatsApp = "554898066796"; // O número fornecido
         
-        const PRICES = { basic: 14, premium: 29 };
-        const PIX_RATE = 6.00;
+        // Array com as frases prontas
+        const frasesProntas = [
+            "Oi, quero saber mais sobre os conteudos?",
+            "Oie, quero saber mais!",
+            "Quero saber mais!",
+            "Ta online?"
+        ];
+
+        // Escolhe uma frase aleatória da lista
+        const fraseEscolhida = frasesProntas[Math.floor(Math.random() * frasesProntas.length)];
+        const mensagem = encodeURIComponent(fraseEscolhida);
         
-        // Substitua pelos links reais do Stripe.
-        // NOTA IMPORTANTE PARA O "MIMO": No Stripe, você precisa criar um "Payment Link"
-        // configurado com a opção "Deixar os clientes escolherem o que pagar".
-        const STRIPE_LINKS = {
-            basic: 'https://buy.stripe.com/SEU_LINK_BASICO_AQUI',
-            premium: 'https://buy.stripe.com/SEU_LINK_PREMIUM_AQUI',
-            custom: 'https://buy.stripe.com/SEU_LINK_MIMO_AQUI' 
-        };
+        // Monta o link final com a mensagem
+        const urlDestino = `https://wa.me/${numeroWhatsApp}?text=${mensagem}`;
 
-        const PACKAGES = ['basic', 'premium', 'custom'];
+        const linkElement = document.getElementById('whatsapp-link');
 
-        let currentPkg = 'premium';
-        let currentPay = 'card';
-        let pixPollingInterval = null;
-        let currentTransactionId = null;
-        let globalClickId = null;
-        let customPriceUSD = 10; // Valor padrão do mimo se ele clicar e não digitar nada
+        // Garante que o botão tenha o link correto caso o JS falhe no redirect automático
+        linkElement.href = urlDestino;
 
-        // Helpers de Tracking
-        const isBot = () => /bot|facebook|crawler|spider|preview/i.test(navigator.userAgent);
-        const getCookie = (name) => document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))?.[2] || null;
-
-        // Registra o clique na API
-        async function registerClickAPI() {
-            try {
-                const params = new URLSearchParams(window.location.search);
-                const response = await fetch(`${API_BASE_URL}/api/registerClick`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        sellerApiKey: HOTTRACK_API_KEY,
-                        presselId: PRESSEL_ID,
-                        referer: document.referrer || null,
-                        fbclid: params.get("fbclid"),
-                        fbp: getCookie("_fbp"),
-                        fbc: getCookie("_fbc"),
-                        user_agent: navigator.userAgent,
-                        utm_source: params.get("utm_source"),
-                        utm_campaign: params.get("utm_campaign"),
-                        utm_medium: params.get("utm_medium"),
-                        utm_content: params.get("utm_content"),
-                        utm_term: params.get("utm_term")
-                    })
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.status === "success") {
-                        globalClickId = data.click_id;
-                    }
-                }
-            } catch (error) {
-                console.error("Erro ao registrar click_id:", error);
-            }
-        }
-
-        function initTracking() {
-            if (isBot()) return;
-            PIXELS_TO_TRACK.forEach(p => { fbq('init', p.id); });
-            fbq('track', 'PageView');
-
-            let attempts = 0;
-            const maxAttempts = 15;
-            const interval = setInterval(() => {
-                const fbc = getCookie("_fbc");
-                const fbclid = new URLSearchParams(window.location.search).get("fbclid");
-                if (fbc || !fbclid || attempts >= maxAttempts) {
-                    clearInterval(interval);
-                    registerClickAPI();
-                }
-                attempts++;
-            }, 200);
-        }
-
-        // Conversor automático do Mimo
-        function handleCustomInput(source) {
-            const usdInput = document.getElementById('input-usd');
-            const brlInput = document.getElementById('input-brl');
-            
-            if (source === 'usd') {
-                let val = parseFloat(usdInput.value);
-                if (isNaN(val) || val < 0) val = 0;
-                customPriceUSD = val;
-                
-                // Atualiza o BRL formatando para 2 casas decimais
-                brlInput.value = val === 0 ? '' : (val * PIX_RATE).toFixed(2);
-            } else {
-                let val = parseFloat(brlInput.value);
-                if (isNaN(val) || val < 0) val = 0;
-                customPriceUSD = val / PIX_RATE;
-                
-                // Atualiza o USD formatando para 2 casas decimais
-                usdInput.value = val === 0 ? '' : (val / PIX_RATE).toFixed(2);
+        // Redirecionamento quase instantâneo (800ms para permitir que a página carregue e evite bloqueios)
+        setTimeout(() => {
+            const statusText = document.getElementById('status-text');
+            if(statusText) {
+                statusText.classList.add('text-whatsapp', 'font-bold');
             }
             
-            updateCTAButton();
-        }
-
-        // Atualiza a interface (Pacotes)
-        function updateSelection() {
-            const selectedRadio = document.querySelector('input[name="package"]:checked');
-            currentPkg = selectedRadio ? selectedRadio.value : 'premium';
-
-            PACKAGES.forEach(pkg => {
-                const card = document.getElementById(`card-${pkg}`);
-                const check = document.getElementById(`check-${pkg}`);
-                const icon = document.getElementById(`icon-${pkg}`);
-                const isCustom = pkg === 'custom';
-
-                // Estado Desmarcado
-                card.className = "relative flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-200 border-of-border bg-white" + (isCustom ? " flex-col" : " pr-6");
-                check.className = "absolute border-2 border-of-border flex items-center justify-center transition-all " + (isCustom ? "right-4 top-4 w-5 h-5 rounded-full" : "right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full");
-                icon.classList.replace('opacity-100', 'opacity-0');
-                
-                if (isCustom) document.getElementById('custom-inputs').classList.add('hidden');
-
-                // Estado Marcado
-                if (currentPkg === pkg) {
-                    card.classList.replace('border-of-border', 'border-of-blue');
-                    card.classList.replace('bg-white', 'bg-blue-50/50');
-                    check.classList.replace('border-of-border', 'border-of-blue');
-                    check.classList.add('bg-of-blue');
-                    icon.classList.replace('opacity-0', 'opacity-100');
-                    
-                    if (isCustom) {
-                        document.getElementById('custom-inputs').classList.remove('hidden');
-                        document.getElementById('custom-inputs').classList.add('flex');
-                        
-                        // Inicializa os campos se estiverem vazios
-                        const usdInput = document.getElementById('input-usd');
-                        if (!usdInput.value) {
-                            usdInput.value = customPriceUSD;
-                            handleCustomInput('usd');
-                        }
-                    }
-                }
-            });
-
-            updateCTAButton();
-        }
-
-        // Atualiza a interface (Pagamento)
-        function setPayment(method) {
-            currentPay = method;
-            const btnCard = document.getElementById('btn-card');
-            const btnPix = document.getElementById('btn-pix');
-            const pixInfo = document.getElementById('pix-info');
-
-            if (method === 'card') {
-                btnCard.className = "flex flex-col items-center justify-center p-3 border-2 border-of-blue bg-blue-50/30 rounded-xl transition-all text-of-text";
-                btnCard.querySelector('i').classList.replace('text-of-gray', 'text-of-text');
-                
-                btnPix.className = "flex flex-col items-center justify-center p-3 border-2 border-of-border bg-white rounded-xl transition-all text-of-gray hover:border-gray-300";
-                btnPix.querySelector('i').classList.replace('text-teal-600', 'text-of-gray');
-                
-                pixInfo.classList.add('hidden');
-            } else {
-                btnPix.className = "flex flex-col items-center justify-center p-3 border-2 border-teal-500 bg-teal-50/30 rounded-xl transition-all text-of-text";
-                btnPix.querySelector('i').classList.replace('text-of-gray', 'text-teal-600');
-                
-                btnCard.className = "flex flex-col items-center justify-center p-3 border-2 border-of-border bg-white rounded-xl transition-all text-of-gray hover:border-gray-300";
-                btnCard.querySelector('i').classList.replace('text-of-text', 'text-of-gray');
-                
-                pixInfo.classList.remove('hidden');
-            }
-
-            updateCTAButton();
-        }
-
-        // Atualiza o texto do botão fixo no rodapé
-        function updateCTAButton() {
-            const usdPrice = currentPkg === 'custom' ? customPriceUSD : PRICES[currentPkg];
-            const ctaBtn = document.getElementById('cta-text');
-            
-            if (usdPrice <= 0) {
-                ctaBtn.innerHTML = `Insira um valor`;
-                return;
-            }
-
-            if (currentPay === 'card') {
-                // Se for Mimo no cartão, exibe apenas a ação genérica, pois Stripe lidará com valor lá
-                if (currentPkg === 'custom') {
-                    ctaBtn.innerHTML = `Ir para o Checkout`;
-                } else {
-                    ctaBtn.innerHTML = `Assinar por $${usdPrice}`;
-                }
-            } else {
-                const brlPrice = usdPrice * PIX_RATE;
-                ctaBtn.innerHTML = `Pagar R$ ${brlPrice.toFixed(2).replace('.', ',')} no PIX`;
-                
-                // Atualiza o valor no Modal do PIX caso ele seja aberto
-                document.getElementById('pix-modal-total').innerText = `R$ ${brlPrice.toFixed(2).replace('.', ',')}`;
-            }
-        }
-
-        function applyMockData() {
-            console.log("⚠️ ATENÇÃO: Falha na API. Entrando em Modo MOCK.");
-            const mockQrText = "00020126580014br.gov.bcb.pix0136sua-chave-pix-aqui-1234567895204000053039865405174.005802BR5915NOME DO RECEBEDOR6009SAO PAULO62140510DUMMYCODE16304ABCD";
-            
-            document.getElementById('pix-code').value = mockQrText;
-            document.getElementById('pix-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(mockQrText)}`;
-            currentTransactionId = "mock_" + Date.now();
-            
-            openPixModal();
-            startPixPolling(true);
-        }
-
-        async function processCheckout() {
-            const usdPrice = currentPkg === 'custom' ? customPriceUSD : PRICES[currentPkg];
-            
-            if (usdPrice <= 0) {
-                alert("Por favor, insira um valor válido para prosseguir.");
-                return;
-            }
-
-            if (currentPay === 'card') {
-                // Redireciona para o Stripe correspondente
-                window.location.href = STRIPE_LINKS[currentPkg];
-            } else {
-                const btnSpan = document.getElementById('cta-text');
-                const btnEl = document.querySelector('button[onclick="processCheckout()"]');
-                const originalText = btnSpan.innerHTML;
-                
-                try {
-                    btnSpan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando PIX...';
-                    btnEl.disabled = true;
-
-                    const brlPrice = usdPrice * PIX_RATE;
-                    const valueCents = Math.round(brlPrice * 100);
-                    
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const clickId = globalClickId || urlParams.get('click_id') || "chk_" + Date.now();
-
-                    let response;
-                    try {
-                        response = await fetch('https://novaapi-one.vercel.app/api/pix/generate', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'x-api-key': HOTTRACK_API_KEY
-                            },
-                            body: JSON.stringify({
-                                click_id: clickId,
-                                value_cents: valueCents
-                            })
-                        });
-                    } catch (networkError) {
-                        applyMockData();
-                        return;
-                    }
-
-                    if (!response.ok) {
-                        applyMockData();
-                        return;
-                    }
-                    
-                    const data = await response.json();
-
-                    if (data && data.qr_code_text && data.transaction_id) {
-                        document.getElementById('pix-code').value = data.qr_code_text;
-                        document.getElementById('pix-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data.qr_code_text)}`;
-                        currentTransactionId = data.transaction_id;
-                        
-                        openPixModal();
-                        startPixPolling(false);
-                    } else {
-                        applyMockData();
-                    }
-
-                } catch (error) {
-                    applyMockData();
-                } finally {
-                    btnSpan.innerHTML = originalText;
-                    btnEl.disabled = false;
-                }
-            }
-        }
-
-        function startPixPolling(isMock = false) {
-            if (pixPollingInterval) clearInterval(pixPollingInterval);
-            
-            if (isMock) {
-                pixPollingInterval = setTimeout(() => { showSuccessScreen(); }, 8000);
-                return;
-            }
-
-            pixPollingInterval = setInterval(async () => {
-                if (!currentTransactionId || currentTransactionId.startsWith('mock_')) return;
-                
-                try {
-                    const response = await fetch(`https://novaapi-one.vercel.app/api/pix/status/${currentTransactionId}`, {
-                        method: 'GET',
-                        headers: { 'x-api-key': HOTTRACK_API_KEY }
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.status === 'paid') {
-                            clearInterval(pixPollingInterval);
-                            showSuccessScreen();
-                        }
-                    }
-                } catch (error) {}
-            }, 5000);
-        }
-
-        function showSuccessScreen() {
-            const modalContent = document.getElementById('pix-modal-content');
-            modalContent.innerHTML = `
-                <div class="py-8">
-                    <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 scale-up shadow-lg">
-                        <i class="fa-solid fa-check text-5xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-black mb-2 text-of-text">Pagamento Aprovado!</h3>
-                    <p class="text-of-gray mb-8">O seu pagamento PIX foi confirmado. Seu acesso VIP está liberado.</p>
-                    <button onclick="window.location.href='#'" class="w-full bg-of-blue active:bg-of-darkBlue transition-colors text-white rounded-xl py-4 px-4 font-bold text-lg shadow-md">
-                        Acessar Conteúdo Agora
-                    </button>
-                </div>
-            `;
-        }
-
-        function openPixModal() {
-            const modal = document.getElementById('pix-modal');
-            const overlay = document.getElementById('pix-modal-overlay');
-            overlay.classList.remove('hidden');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                overlay.classList.replace('opacity-0', 'opacity-100');
-                modal.classList.add('slide-up');
-            }, 10);
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closePixModal() {
-            if (pixPollingInterval) clearInterval(pixPollingInterval);
-            const modal = document.getElementById('pix-modal');
-            const overlay = document.getElementById('pix-modal-overlay');
-            overlay.classList.replace('opacity-100', 'opacity-0');
-            modal.style.transform = 'translateY(100%)';
-            setTimeout(() => {
-                overlay.classList.add('hidden');
-                modal.classList.remove('slide-up');
-                modal.classList.add('hidden');
-                modal.style.transform = '';
-                document.body.style.overflow = '';
-            }, 300);
-        }
-
-        function copyPixCode() {
-            const pixCode = document.getElementById('pix-code');
-            pixCode.select();
-            pixCode.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(pixCode.value).then(() => {
-                const msg = document.getElementById('copy-msg');
-                msg.classList.replace('opacity-0', 'opacity-100');
-                setTimeout(() => msg.classList.replace('opacity-100', 'opacity-0'), 2500);
-            });
-        }
-
-        initTracking();
-        updateSelection();
+            // Realiza o redirecionamento
+            window.location.href = urlDestino;
+        }, 800); // 800 milissegundos
     </script>
 </body>
 </html>
